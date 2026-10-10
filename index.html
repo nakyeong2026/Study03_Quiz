@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>상식 퀴즈</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="student">학번 2601952 이름 안나경</p>
+    <h1>상식 퀴즈</h1>
+  </header>
+
+  <main>
+    <!-- 시작 화면 -->
+    <section id="screen-start" class="screen">
+      <p class="lead">카테고리를 고르세요.</p>
+      <div id="category-buttons" class="button-grid"></div>
+      <p id="practice-note" class="note">연습 모드 · 순위표에 기록되지 않음</p>
+      <p id="data-error" class="error" hidden></p>
+    </section>
+
+    <!-- 문항 화면 -->
+    <section id="screen-quiz" class="screen" hidden>
+      <div class="quiz-top">
+        <span id="quiz-label"></span>
+        <span id="quiz-progress"></span>
+        <span id="quiz-score"></span>
+      </div>
+      <p id="quiz-question" class="question"></p>
+      <div id="quiz-choices" class="choices"></div>
+      <div id="quiz-feedback" class="feedback" hidden>
+        <p id="feedback-verdict" class="verdict"></p>
+        <p id="feedback-explanation"></p>
+        <p class="source">출처: <a id="feedback-source" target="_blank" rel="noopener"></a></p>
+      </div>
+      <button id="next-button" class="primary wide" hidden>다음</button>
+    </section>
+
+    <!-- 결과 화면 -->
+    <section id="screen-result" class="screen" hidden>
+      <h2 id="result-title"></h2>
+      <p id="result-score" class="big-score"></p>
+      <p id="result-sub" class="note" hidden></p>
+      <p id="result-note" class="note">순위표에 기록되지 않음</p>
+      <ol id="result-list" class="result-list"></ol>
+      <div class="button-row">
+        <button id="again-button" class="primary">같은 카테고리 다시</button>
+        <button id="home-button">처음으로</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
