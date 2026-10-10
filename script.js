@@ -197,6 +197,13 @@ function finishRound() {
   showScreen("result");
 }
 
+// 카테고리를 고른 뒤 모드 선택 화면을 보여 준다
+function showModeScreen(category) {
+  state.category = category;
+  $("mode-title").textContent = `${category} · 모드를 고르세요`;
+  showScreen("mode");
+}
+
 // 시작 화면: 문항 데이터를 검사하고 카테고리 버튼을 만든다
 function initStartScreen() {
   const problems = checkQuestions(typeof QUESTIONS === "undefined" ? null : QUESTIONS);
@@ -205,7 +212,7 @@ function initStartScreen() {
     const btn = document.createElement("button");
     btn.textContent = cat;
     btn.disabled = problems.length > 0;
-    btn.addEventListener("click", () => startRound("practice", cat));
+    btn.addEventListener("click", () => showModeScreen(cat));
     box.appendChild(btn);
   });
   if (problems.length) {
@@ -218,6 +225,10 @@ function initStartScreen() {
 $("next-button").addEventListener("click", next);
 $("again-button").addEventListener("click", () => startRound(state.mode, state.category));
 $("home-button").addEventListener("click", () => showScreen("start"));
+document.querySelectorAll(".mode-button").forEach((btn) => {
+  btn.addEventListener("click", () => startRound(btn.dataset.mode, state.category));
+});
+$("mode-back").addEventListener("click", () => showScreen("start"));
 initStartScreen();
 
 // ===== 자체 점검 (주소 끝에 ?test를 붙이면 실행) =====
