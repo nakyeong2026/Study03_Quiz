@@ -3,6 +3,7 @@
 
 const CATEGORIES = ["한국사", "세계지리", "과학", "예술과 문화"];
 const ROUND_SIZE = 10;
+const SPEED_SECONDS = 15;
 const MODE_NAMES = { practice: "연습", speed: "스피드", hint: "힌트" };
 
 // 섞은 새 배열을 돌려준다 (Fisher–Yates). 원본은 바꾸지 않는다
@@ -75,6 +76,8 @@ const state = {
   answered: false,
   usedHint: false,
   results: [],
+  timerId: null,
+  timeLeft: SPEED_SECONDS,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -87,7 +90,36 @@ function showScreen(name) {
   window.scrollTo(0, 0);
 }
 
+// 스피드 모드 타이머: 1초마다 줄이고 0이 되면 시간 초과로 처리한다
+function renderTimer() {
+  const el = $("quiz-timer");
+  el.textContent = `남은 시간 ${state.timeLeft}초`;
+  el.classList.toggle("low", state.timeLeft <= 5);
+}
+
+function stopTimer() {
+  if (state.timerId !== null) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function startTimer() {
+  stopTimer();   // 타이머는 언제나 하나만 돈다
+  state.timeLeft = SPEED_SECONDS;
+  renderTimer();
+  state.timerId = setInterval(() => {
+    state.timeLeft -= 1;
+    renderTimer();
+    if (state.timeLeft <= 0) {
+      stopTimer();
+      choose(null);
+    }
+  }, 1000);
+}
+
 function startRound(mode, category) {
+  stopTimer();
   state.mode = mode;
   state.category = category;
   state.round = buildRound(QUESTIONS, category);
@@ -121,12 +153,16 @@ function renderQuestion() {
   });
   $("quiz-feedback").hidden = true;
   $("next-button").hidden = true;
+  $("quiz-timer").hidden = state.mode !== "speed";
+  if (state.mode === "speed") startTimer();
+  else stopTimer();
 }
 
 // 보기를 고른다. index가 null이면 시간 초과(2단계)
 function choose(index) {
   if (state.answered) return;
   state.answered = true;
+  stopTimer();
   const item = state.round[state.index];
   const timeout = index === null;
   const chosenText = timeout ? null : item.choices[index];
@@ -189,6 +225,7 @@ function renderResultList() {
 }
 
 function finishRound() {
+  stopTimer();
   $("result-title").textContent = `${state.category} · ${MODE_NAMES[state.mode]} 결과`;
   $("result-score").textContent = `${formatScore(state.score)} / ${state.round.length}`;
   $("result-sub").hidden = true;
@@ -261,6 +298,7 @@ const SELF_TESTS = [
   ["출처 주소가 https로 시작한다", () => QUESTIONS.every((q) => /^https:\/\//.test(q.source.url))],
   ["해설이 줄바꿈 없는 90자 이하 한 줄이다", () =>
     QUESTIONS.every((q) => !q.explanation.includes("\n") && q.explanation.length <= 90)],
+  ["스피드 모드 제한 시간이 15초다", () => SPEED_SECONDS === 15],
 ];
 
 function runSelfTest() {
