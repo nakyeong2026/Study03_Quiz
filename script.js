@@ -78,6 +78,7 @@ const state = {
   results: [],
   timerId: null,
   timeLeft: SPEED_SECONDS,
+  retry: null,        // 다시 풀기 중이면 { firstScore, firstTotal }
 };
 
 const $ = (id) => document.getElementById(id);
@@ -126,14 +127,39 @@ function startRound(mode, category) {
   state.index = 0;
   state.score = 0;
   state.results = [];
+  state.retry = null;
+  showScreen("quiz");
+  renderQuestion();
+}
+
+// 이번 판에서 틀린 문항(원본 문항 객체)만 돌려준다
+function wrongQuestions(results) {
+  return results.filter((r) => !r.correct).map((r) => r.item.q);
+}
+
+// 연습 모드: 방금 틀린 문항만 다시 섞어서 푼다. 처음 점수는 바꾸지 않는다
+function startRetry() {
+  const list = wrongQuestions(state.results);
+  if (!list.length) return;
+  if (state.retry === null) {
+    state.retry = { firstScore: state.score, firstTotal: state.round.length };
+  }
+  state.round = makeItems(list);
+  state.index = 0;
+  state.score = 0;
+  state.results = [];
   showScreen("quiz");
   renderQuestion();
 }
 
 function renderTopBar() {
-  $("quiz-label").textContent = `${state.category} · ${MODE_NAMES[state.mode]}`;
+  const retrying = state.retry !== null;
+  $("quiz-label").textContent =
+    `${state.category} · ${MODE_NAMES[state.mode]}${retrying ? " · 다시 풀기" : ""}`;
   $("quiz-progress").textContent = `${state.index + 1} / ${state.round.length}`;
-  $("quiz-score").textContent = `점수 ${formatScore(state.score)}`;
+  $("quiz-score").textContent = retrying
+    ? `처음 점수 ${formatScore(state.retry.firstScore)}`
+    : `점수 ${formatScore(state.score)}`;
 }
 
 function renderQuestion() {
@@ -253,10 +279,21 @@ function renderResultList() {
 
 function finishRound() {
   stopTimer();
-  $("result-title").textContent = `${state.category} · ${MODE_NAMES[state.mode]} 결과`;
-  $("result-score").textContent = `${formatScore(state.score)} / ${state.round.length}`;
-  $("result-sub").hidden = true;
+  const retrying = state.retry !== null;
+  const modeName = MODE_NAMES[state.mode];
+  if (retrying) {
+    $("result-title").textContent = `${state.category} · ${modeName} 다시 풀기 결과`;
+    $("result-score").textContent = `다시 풀기 ${formatScore(state.score)} / ${state.round.length}`;
+    $("result-sub").textContent =
+      `처음 점수 ${formatScore(state.retry.firstScore)} / ${state.retry.firstTotal} (다시 풀기는 점수에 넣지 않음)`;
+    $("result-sub").hidden = false;
+  } else {
+    $("result-title").textContent = `${state.category} · ${modeName} 결과`;
+    $("result-score").textContent = `${formatScore(state.score)} / ${state.round.length}`;
+    $("result-sub").hidden = true;
+  }
   $("result-note").hidden = state.mode !== "practice";
+  $("retry-button").hidden = !(state.mode === "practice" && wrongQuestions(state.results).length > 0);
   renderResultList();
   showScreen("result");
 }
@@ -294,6 +331,7 @@ document.querySelectorAll(".mode-button").forEach((btn) => {
 });
 $("mode-back").addEventListener("click", () => showScreen("start"));
 $("hint-button").addEventListener("click", useHint);
+$("retry-button").addEventListener("click", startRetry);
 initStartScreen();
 
 // ===== 자체 점검 (주소 끝에 ?test를 붙이면 실행) =====
