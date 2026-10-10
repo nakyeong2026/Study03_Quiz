@@ -9,7 +9,7 @@ const QUESTIONS = [
     question: "1392년 공양왕을 몰아내고 새 왕조의 왕위에 올라 조선의 첫 임금이 된 인물은?",
     choices: ["왕건", "이성계", "이방원", "정도전"],
     answer: 1,
-    explanation: "이성계는 위화도 회군으로 실권을 잡은 뒤 1392년 7월 새 왕조의 왕위에 올랐다.",
+    explanation: "이성계는 위화도 회군으로 실권을 잡은 뒤 1392년 새 왕조의 왕위에 올랐다.",
     source: { name: "한국민족문화대백과사전 「태조」", url: "https://encykorea.aks.ac.kr/Article/E0059033" }
   },
   {
@@ -34,15 +34,15 @@ const QUESTIONS = [
     id: "hist-04",
     category: "한국사",
     question: "1597년 정유재란 때 이순신이 울돌목에서 일본 수군을 크게 무찌른 해전은?",
-    choices: ["명량 해전", "한산도 대첩", "노량 해전", "옥포 해전"],
+    choices: ["명량 해전", "부산포 해전", "노량 해전", "옥포 해전"],
     answer: 0,
-    explanation: "명량 해전은 1597년 9월 이순신이 울돌목(명량)에서 일본 수군을 대파한 싸움이다.",
+    explanation: "명량 해전은 1597년 이순신이 울돌목(명량)에서 일본 수군을 대파한 싸움이다.",
     source: { name: "한국민족문화대백과사전 「명량대첩」", url: "https://encykorea.aks.ac.kr/Article/E0018250" }
   },
   {
     id: "hist-05",
     category: "한국사",
-    question: "1919년 전국에서 일어나 중국 상하이의 대한민국 임시 정부 수립으로 이어진 독립만세운동은?",
+    question: "1919년 전국에서 만세 시위로 일어나 중국 상하이의 대한민국 임시 정부 수립으로 이어진 민족 운동은?",
     choices: ["6·10 만세 운동", "3·1 운동", "물산 장려 운동", "국채 보상 운동"],
     answer: 1,
     explanation: "3·1 운동은 1919년 3월 1일 시작된 거족적 독립만세운동으로 임시 정부 수립으로 이어졌다.",
@@ -101,14 +101,14 @@ const QUESTIONS = [
     question: "오스트레일리아의 연방 수도는?",
     choices: ["시드니", "멜버른", "퍼스", "캔버라"],
     answer: 3,
-    explanation: "캔버라는 오스트레일리아 연방 수도로, 1927년 의회가 멜버른에서 옮겨 왔다.",
+    explanation: "캔버라는 오스트레일리아 남동부의 수도 특별 지역(ACT)에 있는 연방 수도다.",
     source: { name: "브리태니커 백과사전 「Canberra」", url: "https://www.britannica.com/place/Canberra" }
   },
   {
     id: "geo-02",
     category: "세계지리",
     question: "나일강이 흘러 들어가는 바다는?",
-    choices: ["지중해", "홍해", "아라비아해", "카스피해"],
+    choices: ["지중해", "홍해", "흑해", "카스피해"],
     answer: 0,
     explanation: "나일강은 아프리카 북동부를 길게 흐른 뒤 지중해로 흘러든다.",
     source: { name: "내셔널지오그래픽 교육 「Nile River」", url: "https://education.nationalgeographic.org/resource/nile-river/" }
@@ -153,7 +153,7 @@ const QUESTIONS = [
     id: "geo-07",
     category: "세계지리",
     question: "안데스산맥이 뻗어 있는 대륙은?",
-    choices: ["북아메리카", "남아메리카", "아프리카", "유럽"],
+    choices: ["북아메리카", "남아메리카", "아프리카", "아시아"],
     answer: 1,
     explanation: "안데스산맥은 남아메리카의 산계로, 지구의 큰 자연 지형 가운데 하나다.",
     source: { name: "브리태니커 백과사전 「Andes Mountains」", url: "https://www.britannica.com/place/Andes-Mountains" }
@@ -254,7 +254,7 @@ const QUESTIONS = [
     id: "sci-08",
     category: "과학",
     question: "1901년 사람의 혈액형이 여러 가지임을 밝혀 안전한 수혈의 길을 연 과학자는?",
-    choices: ["란트슈타이너", "히포크라테스", "레이우엔훅", "파스퇴르"],
+    choices: ["란트슈타이너", "메치니코프", "에를리히", "파스퇴르"],
     answer: 0,
     explanation: "란트슈타이너는 1901년 사람마다 혈액형이 다름을 밝혀 안전한 수혈을 가능하게 했다.",
     source: { name: "노벨상 공식 사이트 「Karl Landsteiner」", url: "https://www.nobelprize.org/prizes/medicine/1930/landsteiner/facts/" }
