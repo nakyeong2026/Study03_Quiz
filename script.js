@@ -65,6 +65,135 @@ function formatScore(n) {
   return Number.isInteger(n) ? String(n) : n.toFixed(1);
 }
 
+// ===== 화면 =====
+const state = {
+  mode: "practice",   // "practice" | "speed" | "hint"
+  category: null,
+  round: [],          // makeItems()로 만든 이번 판 목록
+  index: 0,
+  score: 0,
+  answered: false,
+  usedHint: false,
+  results: [],
+};
+
+const $ = (id) => document.getElementById(id);
+
+// 화면 하나만 보이게 한다
+function showScreen(name) {
+  document.querySelectorAll(".screen").forEach((el) => {
+    el.hidden = el.id !== `screen-${name}`;
+  });
+  window.scrollTo(0, 0);
+}
+
+function startRound(mode, category) {
+  state.mode = mode;
+  state.category = category;
+  state.round = buildRound(QUESTIONS, category);
+  state.index = 0;
+  state.score = 0;
+  state.results = [];
+  showScreen("quiz");
+  renderQuestion();
+}
+
+function renderTopBar() {
+  $("quiz-label").textContent = `${state.category} · ${MODE_NAMES[state.mode]}`;
+  $("quiz-progress").textContent = `${state.index + 1} / ${state.round.length}`;
+  $("quiz-score").textContent = `점수 ${formatScore(state.score)}`;
+}
+
+function renderQuestion() {
+  const item = state.round[state.index];
+  state.answered = false;
+  state.usedHint = false;
+  renderTopBar();
+  $("quiz-question").textContent = item.q.question;
+  const box = $("quiz-choices");
+  box.replaceChildren();
+  item.choices.forEach((text, i) => {
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.textContent = text;
+    btn.addEventListener("click", () => choose(i));
+    box.appendChild(btn);
+  });
+  $("quiz-feedback").hidden = true;
+  $("next-button").hidden = true;
+}
+
+// 보기를 고른다. index가 null이면 시간 초과(2단계)
+function choose(index) {
+  if (state.answered) return;
+  state.answered = true;
+  const item = state.round[state.index];
+  const timeout = index === null;
+  const chosenText = timeout ? null : item.choices[index];
+  const correct = chosenText === item.answerText;
+  const points = scoreFor(correct, state.usedHint);
+  state.score += points;
+  state.results.push({ item, correct, chosenText, points, usedHint: state.usedHint, timeout });
+
+  // 보기를 모두 잠그고 정답·오답을 표시한다. 색만으로 구분하지 않게 ✓, ✗를 붙인다
+  $("quiz-choices").querySelectorAll(".choice").forEach((btn, i) => {
+    btn.disabled = true;
+    if (item.choices[i] === item.answerText) {
+      btn.classList.add("correct");
+      btn.textContent = `✓ ${item.choices[i]}`;
+    } else if (i === index) {
+      btn.classList.add("wrong");
+      btn.textContent = `✗ ${item.choices[i]}`;
+    }
+  });
+
+  let verdict;
+  if (correct) verdict = state.usedHint ? "정답! (힌트 사용, 0.5점)" : "정답!";
+  else if (timeout) verdict = `시간 초과 (정답: ${item.answerText})`;
+  else verdict = `오답 (정답: ${item.answerText})`;
+  $("feedback-verdict").textContent = verdict;
+  $("feedback-explanation").textContent = item.q.explanation;
+  const link = $("feedback-source");
+  link.textContent = item.q.source.name;
+  link.href = item.q.source.url;
+  $("quiz-feedback").hidden = false;
+
+  renderTopBar();
+  const last = state.index === state.round.length - 1;
+  $("next-button").textContent = last ? "결과 보기" : "다음";
+  $("next-button").hidden = false;
+}
+
+function next() {
+  if (state.index < state.round.length - 1) {
+    state.index += 1;
+    renderQuestion();
+  } else {
+    finishRound();
+  }
+}
+
+// 시작 화면: 문항 데이터를 검사하고 카테고리 버튼을 만든다
+function initStartScreen() {
+  const problems = checkQuestions(typeof QUESTIONS === "undefined" ? null : QUESTIONS);
+  const box = $("category-buttons");
+  CATEGORIES.forEach((cat) => {
+    const btn = document.createElement("button");
+    btn.textContent = cat;
+    btn.disabled = problems.length > 0;
+    btn.addEventListener("click", () => startRound("practice", cat));
+    box.appendChild(btn);
+  });
+  if (problems.length) {
+    $("data-error").textContent = "문항 데이터에 오류가 있어 시작할 수 없음\n" + problems.join("\n");
+    $("data-error").hidden = false;
+  }
+}
+
+// ===== 시작 =====
+$("next-button").addEventListener("click", next);
+initStartScreen();
+
 // ===== 자체 점검 (주소 끝에 ?test를 붙이면 실행) =====
 const SELF_TESTS = [
   ["문항이 40개다", () => QUESTIONS.length === 40],
