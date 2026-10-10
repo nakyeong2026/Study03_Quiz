@@ -17,8 +17,29 @@
     <section id="screen-start" class="screen">
       <p class="lead">카테고리를 고르세요.</p>
       <div id="category-buttons" class="button-grid"></div>
-      <p id="practice-note" class="note">연습 모드 · 순위표에 기록되지 않음</p>
       <p id="data-error" class="error" hidden></p>
+    </section>
+
+    <!-- 모드 선택 화면 -->
+    <section id="screen-mode" class="screen" hidden>
+      <h2 id="mode-title"></h2>
+      <div class="mode-buttons">
+        <button class="mode-button" data-mode="practice">
+          <strong>연습</strong>
+          <span class="mode-rule">시간 제한·힌트 없음, 맞히면 1점 · 순위표에 기록되지 않음</span>
+        </button>
+        <button class="mode-button" data-mode="speed">
+          <strong>스피드</strong>
+          <span class="mode-rule">문항마다 15초, 시간이 지나면 오답 · 맞히면 1점</span>
+        </button>
+        <button class="mode-button" data-mode="hint">
+          <strong>힌트</strong>
+          <span class="mode-rule">문항마다 힌트 1번(오답 2개 지움) · 힌트 쓰고 맞히면 0.5점</span>
+        </button>
+      </div>
+      <div class="button-row">
+        <button id="mode-back">뒤로</button>
+      </div>
     </section>
 
     <!-- 문항 화면 -->
@@ -27,8 +48,10 @@
         <span id="quiz-label"></span>
         <span id="quiz-progress"></span>
         <span id="quiz-score"></span>
+        <span id="quiz-timer" class="timer" hidden></span>
       </div>
       <p id="quiz-question" class="question"></p>
+      <button id="hint-button" class="hint-button" hidden>힌트 (오답 2개 지우기)</button>
       <div id="quiz-choices" class="choices"></div>
       <div id="quiz-feedback" class="feedback" hidden>
         <p id="feedback-verdict" class="verdict"></p>
@@ -46,6 +69,7 @@
       <p id="result-note" class="note">순위표에 기록되지 않음</p>
       <ol id="result-list" class="result-list"></ol>
       <div class="button-row">
+        <button id="retry-button" class="primary" hidden>틀린 문제 다시 풀기</button>
         <button id="again-button" class="primary">같은 카테고리 다시</button>
         <button id="home-button">처음으로</button>
       </div>
