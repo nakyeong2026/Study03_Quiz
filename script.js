@@ -153,9 +153,35 @@ function renderQuestion() {
   });
   $("quiz-feedback").hidden = true;
   $("next-button").hidden = true;
+  const hintBtn = $("hint-button");
+  hintBtn.hidden = state.mode !== "hint";
+  hintBtn.disabled = false;
+  hintBtn.textContent = "힌트 (오답 2개 지우기)";
   $("quiz-timer").hidden = state.mode !== "speed";
   if (state.mode === "speed") startTimer();
   else stopTimer();
+}
+
+// 정답이 아닌 보기 중 2개를 무작위로 고른다
+function pickHintRemovals(choices, answerText) {
+  return shuffle(choices.filter((c) => c !== answerText)).slice(0, 2);
+}
+
+// 힌트: 오답 보기 2개를 흐리게 하고 누를 수 없게 한다. 문항마다 한 번
+function useHint() {
+  if (state.answered || state.usedHint) return;
+  state.usedHint = true;
+  const item = state.round[state.index];
+  const removed = pickHintRemovals(item.choices, item.answerText);
+  $("quiz-choices").querySelectorAll(".choice").forEach((btn, i) => {
+    if (removed.includes(item.choices[i])) {
+      btn.disabled = true;
+      btn.classList.add("removed");
+    }
+  });
+  const hintBtn = $("hint-button");
+  hintBtn.disabled = true;
+  hintBtn.textContent = "힌트 사용함";
 }
 
 // 보기를 고른다. index가 null이면 시간 초과(2단계)
@@ -163,6 +189,7 @@ function choose(index) {
   if (state.answered) return;
   state.answered = true;
   stopTimer();
+  $("hint-button").disabled = true;
   const item = state.round[state.index];
   const timeout = index === null;
   const chosenText = timeout ? null : item.choices[index];
@@ -266,6 +293,7 @@ document.querySelectorAll(".mode-button").forEach((btn) => {
   btn.addEventListener("click", () => startRound(btn.dataset.mode, state.category));
 });
 $("mode-back").addEventListener("click", () => showScreen("start"));
+$("hint-button").addEventListener("click", useHint);
 initStartScreen();
 
 // ===== 자체 점검 (주소 끝에 ?test를 붙이면 실행) =====
@@ -299,6 +327,14 @@ const SELF_TESTS = [
   ["해설이 줄바꿈 없는 90자 이하 한 줄이다", () =>
     QUESTIONS.every((q) => !q.explanation.includes("\n") && q.explanation.length <= 90)],
   ["스피드 모드 제한 시간이 15초다", () => SPEED_SECONDS === 15],
+  ["힌트를 쓰고 맞히면 0.5점, 틀리면 0점이다", () => scoreFor(true, true) === 0.5 && scoreFor(false, true) === 0],
+  ["힌트가 정답이 아닌 서로 다른 보기 2개를 고른다", () => {
+    for (let n = 0; n < 50; n++) {
+      const picked = pickHintRemovals(["가", "나", "다", "라"], "다");
+      if (picked.length !== 2 || picked[0] === picked[1] || picked.includes("다")) return false;
+    }
+    return true;
+  }],
 ];
 
 function runSelfTest() {

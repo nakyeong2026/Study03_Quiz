@@ -105,3 +105,7 @@ button.wide { width: 100%; margin-top: 14px; }
 /* 스피드 모드 타이머 */
 .timer { font-weight: bold; color: var(--text); }
 .timer.low { color: var(--wrong); }
+
+/* 힌트 모드 */
+.hint-button { margin-bottom: 10px; }
+.choice.removed { opacity: 0.4; text-decoration: line-through; }
