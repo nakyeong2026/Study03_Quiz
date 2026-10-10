@@ -173,6 +173,30 @@ function next() {
   }
 }
 
+// 결과 화면의 문항별 목록
+function renderResultList() {
+  const list = $("result-list");
+  list.replaceChildren();
+  state.results.forEach((r) => {
+    const li = document.createElement("li");
+    const mark = document.createElement("span");
+    mark.className = r.correct ? "ok" : "ng";
+    if (r.correct) mark.textContent = r.usedHint ? "정답 (힌트 0.5점)" : "정답";
+    else mark.textContent = r.timeout ? "시간 초과" : "오답";
+    li.append(mark, ` ${r.item.q.question} → ${r.item.answerText}`);
+    list.appendChild(li);
+  });
+}
+
+function finishRound() {
+  $("result-title").textContent = `${state.category} · ${MODE_NAMES[state.mode]} 결과`;
+  $("result-score").textContent = `${formatScore(state.score)} / ${state.round.length}`;
+  $("result-sub").hidden = true;
+  $("result-note").hidden = state.mode !== "practice";
+  renderResultList();
+  showScreen("result");
+}
+
 // 시작 화면: 문항 데이터를 검사하고 카테고리 버튼을 만든다
 function initStartScreen() {
   const problems = checkQuestions(typeof QUESTIONS === "undefined" ? null : QUESTIONS);
@@ -192,6 +216,8 @@ function initStartScreen() {
 
 // ===== 시작 =====
 $("next-button").addEventListener("click", next);
+$("again-button").addEventListener("click", () => startRound(state.mode, state.category));
+$("home-button").addEventListener("click", () => showScreen("start"));
 initStartScreen();
 
 // ===== 자체 점검 (주소 끝에 ?test를 붙이면 실행) =====
